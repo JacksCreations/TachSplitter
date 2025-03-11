@@ -77,7 +77,7 @@ function App() {
                 type="text"
                 value={startTach}
                 onChange={(e) => handleNumericInput(e, setStartTach)}
-                className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-4 pr-12 py-3 rounded-xl text-lg placeholder-black"
+                className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-4 pr-12 py-3 rounded-xl text-lg text-black"
                 placeholder="0.0"
               />
               <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -99,7 +99,7 @@ function App() {
                 type="text"
                 value={endTach}
                 onChange={(e) => handleNumericInput(e, setEndTach)}
-                className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-4 pr-12 py-3 rounded-xl text-lg"
+                className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-4 pr-12 py-3 rounded-xl text-lg text-black"
                 placeholder="0.0"
               />
               <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
