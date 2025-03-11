@@ -5,38 +5,57 @@ import "./App.css";
 import { Clipboard } from "lucide-react";
 
 function App() {
-  const [startTach, setStartTach] = useState(0.0);
-  const [endTach, setEndTach] = useState(0.0);
+  // Initialize with proper floats rather than integers
+  const [startTach, setStartTach] = useState("");
+  const [endTach, setEndTach] = useState("");
   const [totalTach, setTotalTach] = useState(0.0);
   const [copySuccess, setCopySuccess] = useState(false);
 
   // Generic handler for any numeric input
   const handleNumericInput = (e, setterFunction) => {
     const inputValue = e.target.value;
-    setterFunction(inputValue);
+
+    // Allow only numbers and a single decimal point
+    const numericRegex = /^[0-9]*\.?[0-9]*$/;
+    if (inputValue === "" || numericRegex.test(inputValue)) {
+      setterFunction(inputValue);
+    }
   };
 
   // Calculate total tach whenever start or end tach changes
   useEffect(() => {
-    const start = startTach === "" ? 0 : parseFloat(startTach);
-    const end = endTach === "" ? 0 : parseFloat(endTach);
+    // Convert to floating point numbers, ensuring decimal precision
+    const start = startTach === "" ? 0.0 : parseFloat(startTach);
+    const end = endTach === "" ? 0.0 : parseFloat(endTach);
 
-    // Calculate the difference and round to nearest 10th
+    // Calculate the difference without rounding
     const difference = end - start;
-    const roundedDifference = Math.round(difference * 10) / 10;
 
-    setTotalTach(roundedDifference);
+    // Set the exact difference without rounding
+    setTotalTach(difference);
   }, [startTach, endTach]);
 
-  // Calculate check-in time for person 1
-  const checkInTimePerson1 =
-    parseFloat(startTach) + parseFloat(totalTach / 2) || 0;
+  // Calculate per person tach time (exactly half, maintaining decimal precision)
   const perPersonTach = totalTach / 2;
+
+  // Calculate check-in time for person 1 as a function to ensure fresh calculation
+  const getCheckInTimePerson1 = () => {
+    const start = parseFloat(startTach) || 0.0;
+    const half = totalTach / 2; // totalTach is already a float
+    return start + half;
+  };
+
+  // Format a number to display with 2 decimal places
+  const formatDecimal = (num) => {
+    // Display with 2 decimal places to show exact values like 1.25
+    return num.toFixed(2);
+  };
 
   // Function to copy check-in time to clipboard
   const copyToClipboard = () => {
+    const checkInTime = formatDecimal(getCheckInTimePerson1());
     navigator.clipboard
-      .writeText(checkInTimePerson1.toFixed(1))
+      .writeText(checkInTime)
       .then(() => {
         setCopySuccess(true);
         setTimeout(() => setCopySuccess(false), 2000); // Reset after 2 seconds
@@ -75,9 +94,10 @@ function App() {
               <input
                 id="start-tach-input"
                 type="text"
+                inputMode="decimal"
                 value={startTach}
                 onChange={(e) => handleNumericInput(e, setStartTach)}
-                className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-4 pr-12 py-3 rounded-xl text-lg text-black"
+                className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-4 pr-12 py-3 rounded-xl text-lg text-black placeholder-black"
                 placeholder="0.0"
               />
               <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -97,6 +117,7 @@ function App() {
               <input
                 id="end-tach-input"
                 type="text"
+                inputMode="decimal"
                 value={endTach}
                 onChange={(e) => handleNumericInput(e, setEndTach)}
                 className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-4 pr-12 py-3 rounded-xl text-lg text-black"
@@ -118,21 +139,21 @@ function App() {
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Total Time:</span>
                   <span className="text-lg font-bold text-blue-900">
-                    {totalTach} hrs
+                    {formatDecimal(totalTach)} hrs
                   </span>
                 </div>
 
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Time Per Person:</span>
                   <span className="text-lg font-bold text-blue-900">
-                    {perPersonTach.toFixed(1)} hrs
+                    {formatDecimal(perPersonTach)} hrs
                   </span>
                 </div>
 
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Person 1 Check-in Time:</span>
                   <span className="text-lg font-bold text-blue-900">
-                    {checkInTimePerson1.toFixed(1)} hrs
+                    {formatDecimal(getCheckInTimePerson1())} hrs
                   </span>
                 </div>
               </div>
